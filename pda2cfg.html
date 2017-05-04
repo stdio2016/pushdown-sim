@@ -1,0 +1,54 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>Pushdown Automata</title>
+<style>
+.place-here{
+  background-color: lightgray;
+  font-family: monospace;
+}
+</style>
+</head>
+<body>
+<p>Type transitions here</p>
+<p>Transition format is <code><span class='place-here'>current state</span>,<span class='place-here'>input alphabet</span>,<span class='place-here'>stack top symbol</span>,<span class='place-here'>next state</span>,<span class='place-here'>next stack symbols</span></code></p>
+
+<p>Each input alphabet is a single character enclosed in single quote. If input alphabet is lambda (&lambda;), then just omit the field. If input alphabet is A~Z, a~z, underline(_), or 0~9, then you don't need to quote it.</p>
+<p>State names and stack symbol names are strings with only characters A~Z, a~z, underline(_) or 0~9.</p>
+<p>If a transition writes more than one symbols to the stack, use space to separate each symbol. If a transition writes lambda (&lambda;) to the stack, leave the <span class='place-here'>next stack symbols</span> field blank</p>
+<p>To specify initial state, use <code>start = <span class='place-here'>initial state</span></code>. The default initial state is q0.</p>
+<p>To specify final states, use <code>final = <span class='place-here'>final states separated with spaces</span></code>. The default final state is qF.</p>
+<p>To specify stack start symbol, use <code>stack = <span class='place-here'>stack start symbol</span></code>. The default stack start symbol is z.</p>
+<p>Everything in this syntax is case-sensitive, so qF is different from Qf and start is different from StArt.</p>
+<textarea style='height: 10em; width: 20em;' id='in'></textarea><br>
+<input type="button" value="OK" onclick="pda2cfg()">
+<div>
+<p>The result is:</p>
+<pre id='output'></pre>
+</div>
+<script>
+function pda2cfg(){
+  var d=document.getElementById('in').value;
+  var f = d.split('\n');
+  var g = [];
+  for (var i=0;i<f.length;i++) {
+    if(/^(start|final|stack) =/.test(f[i])){
+      ;
+    }
+    else {
+      var t = f[i].match(/^([^,]*),\s*('.'|[^',\s]?)\s*,([^,]*),(.*)$/);
+      if (!t) {
+        g = "Unable to parse";
+        break;
+      }
+      t[0]=0;
+      g.push(t);
+    }
+  }
+  document.getElementById('output').innerText = JSON.stringify(g);
+}
+</script>
+</body>
+</html>
