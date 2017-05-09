@@ -1,0 +1,33 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>Pushdown Automata Simulator</title>
+<style>
+.place-here{
+  background-color: lightgray;
+  font-family: monospace;
+}
+</style>
+<script src='js/pda.js'></script>
+</head>
+<body>
+<h1>Pushdown Automata Simulator</h1>
+<p>Type transitions here</p>
+<p><a href='help.html'>Format</a></p>
+<textarea style='height: 10em; width: 20em;' id='in'></textarea><br>
+<input type="button" value="OK" onclick="pda2cfg()">
+<div>
+<p>The result is:</p>
+<pre id='output'></pre>
+</div>
+<script>
+function pda2cfg(){
+  var d=document.getElementById('in').value;
+  var g = PDA.parse(d);
+  document.getElementById('output').innerText = JSON.stringify(g,null,2);
+}
+</script>
+</body>
+</html>
