@@ -49,6 +49,8 @@ PDA.parse = function (str) {
   var startStack = "z";
   var finalStates = ["qF"];
   for (var i=0;i<f.length;i++) {
+    // skip comment
+    if (/^\s*(?:;.*)?$/.test(f[i])) continue;
     var s = f[i].match(/^\s*([^=]*)= (.*)$/);
     if(s){
       var tag = stringTrim(s[1]);
