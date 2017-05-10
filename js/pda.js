@@ -11,14 +11,18 @@ function PDATransition(state, input, stackTop, nextState, rewrite){
 };
 
 PDATransition.prototype.toString = function () {
+  var ch, rewrite = this.rewrite.join(" ");
   if (this.input == "") {
     ch = "λ";
   }
   else {
     ch = "'" + this.input + "'";
   }
+  if (this.rewrite.length == 0) {
+    rewrite = "λ";
+  }
   return this.state + "," + ch + "," + this.stackTop + "," +
-    this.nextState + "," + this.rewrite.join(' ');
+    this.nextState + "," + rewrite;
 };
 
 function PDA(transitions, start, startStack, finalStates){
@@ -60,7 +64,7 @@ PDA.parse = function (str) {
       }
     }
     else {
-      var t = f[i].match(/^([^,]*),\s*('.'|[^,\s]?)\s*,([^,]*),([^,]*),(.*)$/);
+      var t = f[i].match(/^([^,]*),\s*('.'|[^,\s]?|lambda)\s*,([^,]*),([^,]*),(.*)$/);
       if (!t) {
         throw new SyntaxError("Transition format error");
         break;
@@ -70,10 +74,13 @@ PDA.parse = function (str) {
       if (input.charAt(0) == "'") {
         input = input.charAt(1);
       }
+      else if (input == "λ" || input == "lambda") { // lambda
+        input = "";
+      }
       var stackTop = stringTrim(t[3]);
       var nextState = stringTrim(t[4]);
       var rewrite = stringTrim(t[5]).split(/\s+/);
-      if(rewrite[0] == '') rewrite = [];
+      if(rewrite[0] == '' || rewrite[0] == "λ") rewrite = [];
 
       var legalName = /^[a-zA-Z0-9_]+$/;
       if (!legalName.test(state)) {
