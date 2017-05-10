@@ -25,8 +25,18 @@
 <script>
 function pda2cfg(){
   var d=document.getElementById('in').value;
-  var g = PDA.parse(d);
-  document.getElementById('output').innerText = JSON.stringify(g,null,2);
+  GenSym.id = 0;
+  var g;
+  try {
+    g = PDA.parse(d);
+    g = g.normalizeForSim();
+    document.getElementById('output').innerText = g.toString();
+  }
+  catch (x) {
+    if (x instanceof window.SyntaxError) {
+      document.getElementById('output').innerText = x;
+    }
+  }
 }
 </script>
 </body>
