@@ -205,7 +205,7 @@ PDA.prototype.pda2cfg = function () {
   var stateCount = states.size, symCount = syms.size;
   var variables = new Map(); // var id -> CFG variable
   function getVar(qi, A, qj) {
-    var id = (qi * stateCount + A) * symCount + qj;
+    var id = (qi * symCount + A) * stateCount + qj;
     var V = variables.get(id);
     if (V) return V;
     V = new CFGVariable(stateArr[qi] + "," + symArr[A] + "," + stateArr[qj]);
@@ -233,7 +233,7 @@ PDA.prototype.pda2cfg = function () {
       for (var qk = 0; qk < stateCount; qk++) {
         for (var ql = 0; ql < stateCount; ql++) {
           var V = getVar(qi, A, qk);
-          var V1 = getVar(qj, B, qk), V2 = getVar(qk, C, ql);
+          var V1 = getVar(qj, B, ql), V2 = getVar(ql, C, qk);
           if (t.input === "") {
             prods.push(new CFGProduction(V, [V1, V2]));
           }

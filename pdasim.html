@@ -32,6 +32,7 @@ function pda2cfg(){
     g = PDA.parse(d);
     g = g.normalizeForSim();
     g = g.pda2cfg();
+    //g.removeUnused();
     document.getElementById('output').innerText = g.toString();
   }
   catch (x) {
