@@ -64,7 +64,7 @@ function CFGVariable(name) {
   this.mark = false;
 }
 
-function CFGProduction(from, to) {
+function CFGProduction(from, to, payload) {
   this.from = from;
   this.to = to;
   this.toVars = [];
@@ -74,6 +74,7 @@ function CFGProduction(from, to) {
     }
   }
   this.markCount = 0;
+  this.payload = payload || null;
 }
 
 CFGProduction.prototype.toString = function () {
@@ -88,6 +89,9 @@ CFGProduction.prototype.toString = function () {
   }
   if (this.to.length == 0) {
     buf.push("λ");
+  }
+  if (this.payload) {
+    buf.push("(" + this.payload + ")");
   }
   return buf.join(" ");
 };

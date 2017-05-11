@@ -178,6 +178,7 @@ PDA.prototype.normalizeForSim = function () {
       trans.push(new PDATransition(qDebug, "", s, qDebug, []));
     });
     trans.push(new PDATransition(qDebug, "", startStack, qFinal, []));
+    trans.push(new PDATransition(q, "", startStack, qFinal, []));
   });
   return new PDA(pda.transitions.concat(trans), start, startStack, finals);
 };
@@ -219,12 +220,16 @@ PDA.prototype.pda2cfg = function () {
     var A = symIds.get(t.stackTop);
     if (t.rewrite.length == 0) {
       // (qiAqj) -> a
+      var payload = null;
+      if (t.nextState instanceof GenSym && / D$/.test(t.nextState.name)) {
+        payload = t.stackTop.toString();
+      }
       var V = getVar(qi, A, qj);
       if (t.input === "") {
-        prods.push(new CFGProduction(V, []));
+        prods.push(new CFGProduction(V, [], payload));
       }
       else {
-        prods.push(new CFGProduction(V, [t.input]));
+        prods.push(new CFGProduction(V, [t.input], payload));
       }
     }
     else if (t.rewrite.length == 2) {
