@@ -165,7 +165,7 @@ PDA.prototype.normalizeForSim = function () {
   var trans = [];
   var start = new GenSym("qStart");
   var startStack = new GenSym("s0");
-  trans.push(new PDATransition(start, "", startStack, this.start, [this.startStack]));
+  trans.push(new PDATransition(start, "", startStack, this.start, [this.startStack, startStack]));
   var states = this.getStates();
   var symbols = this.getStackSymbols();
   var finals = [];
@@ -180,4 +180,78 @@ PDA.prototype.normalizeForSim = function () {
     trans.push(new PDATransition(qDebug, "", startStack, qFinal, []));
   });
   return new PDA(pda.transitions.concat(trans), start, startStack, finals);
+};
+
+// You need to normalize PDA before converting to CFG
+PDA.prototype.pda2cfg = function () {
+  var states = this.getStates();
+  var stateIds = new Map(); // state -> state id
+  var i = 0;
+  var stateArr = []; // state id -> state
+  states.forEach(function (q) {
+    stateIds.set(q, i);
+    stateArr.push(q);
+    ++i;
+  });
+  var syms = this.getStackSymbols();
+  var symIds = new Map(); // stack symbol -> symbol id
+  var symArr = []; // symbol id -> stack symbol
+  i = 0;
+  syms.forEach(function (s) {
+    symIds.set(s, i);
+    symArr.push(s);
+    ++i;
+  });
+  var stateCount = states.size, symCount = syms.size;
+  var variables = new Map(); // var id -> CFG variable
+  function getVar(qi, A, qj) {
+    var id = (qi * stateCount + A) * symCount + qj;
+    var V = variables.get(id);
+    if (V) return V;
+    V = new CFGVariable(stateArr[qi] + "," + symArr[A] + "," + stateArr[qj]);
+    variables.set(id, V);
+    return V;
+  }
+  var prods = [];
+  for (var i = 0; i < this.transitions.length; i++) {
+    var t = this.transitions[i];
+    var qi = stateIds.get(t.state), qj = stateIds.get(t.nextState);
+    var A = symIds.get(t.stackTop);
+    if (t.rewrite.length == 0) {
+      // (qiAqj) -> a
+      var V = getVar(qi, A, qj);
+      if (t.input === "") {
+        prods.push(new CFGProduction(V, []));
+      }
+      else {
+        prods.push(new CFGProduction(V, [t.input]));
+      }
+    }
+    else if (t.rewrite.length == 2) {
+      // for each qk,ql, (qiAqk) -> a (qjBqk) (qkCql)
+      var B = symIds.get(t.rewrite[0]), C = symIds.get(t.rewrite[1]);
+      for (var qk = 0; qk < stateCount; qk++) {
+        for (var ql = 0; ql < stateCount; ql++) {
+          var V = getVar(qi, A, qk);
+          var V1 = getVar(qj, B, qk), V2 = getVar(qk, C, ql);
+          if (t.input === "") {
+            prods.push(new CFGProduction(V, [V1, V2]));
+          }
+          else {
+            prods.push(new CFGProduction(V, [t.input, V1, V2]));
+          }
+        }
+      }
+    }
+    else {
+      // this PDA is not normalized
+      throw new TypeError("This PDA is not normalized");
+    }
+  }
+  var vs = [];
+  var S = getVar(stateIds.get(this.start), symIds.get(this.startStack), stateIds.get(this.finalStates[0]));
+  variables.forEach(function (V) {
+    vs.push(V);
+  });
+  return new CFG(vs, [], S, prods);
 };

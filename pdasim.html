@@ -11,6 +11,7 @@
 }
 </style>
 <script src='js/pda.js'></script>
+<script src='js/cfg.js'></script>
 </head>
 <body>
 <h1>Pushdown Automata Simulator</h1>
@@ -30,11 +31,15 @@ function pda2cfg(){
   try {
     g = PDA.parse(d);
     g = g.normalizeForSim();
+    g = g.pda2cfg();
     document.getElementById('output').innerText = g.toString();
   }
   catch (x) {
     if (x instanceof window.SyntaxError) {
       document.getElementById('output').innerText = x;
+    }
+    else {
+      throw x;
     }
   }
 }

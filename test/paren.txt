@@ -1,0 +1,7 @@
+; PDA that accepts matched parentheses
+; (()()()) is accepted
+; (() is not accepted
+q0,'(',z,q0,a z
+q0,'(',a,q0,a a
+q0,')',a,q0,£f
+q0,£f,z,qF,£f
